@@ -1,9 +1,11 @@
+
 import { Timestamp } from 'firebase/firestore';
+import { PostCategoryValue } from './constants';
 
 export interface UserProfile {
   uid: string;
-  email?: string; // Optional: for email/password users
-  displayName?: string; // Optional: for users who set a display name
+  email?: string; 
+  displayName?: string; 
   role: "user" | "admin";
   joinedAt: Timestamp;
 }
@@ -11,12 +13,13 @@ export interface UserProfile {
 export interface Post {
   id: string;
   authorUid: string;
-  category: 'GBV' | 'Stress' | 'Depression' | 'SuicidalThoughts' | 'GeneralSupport' | 'Other';
-  title: string; // Added title for better PostCard display
+  category: PostCategoryValue;
+  title: string;
   content: string;
   timestamp: Timestamp;
-  flagged?: boolean; // For admin moderation
-  replyCount?: number; // Optional: to show on PostCard
+  flagged?: boolean;
+  replyCount?: number;
+  isAnonymous: boolean; // Added for anonymous posting
 }
 
 export interface Comment {
@@ -28,3 +31,4 @@ export interface Comment {
 }
 
 // Add other types as the application grows
+
