@@ -61,7 +61,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        // Custom Lavender Theme
+        'lavender-light': '#F5F3FF', // For backgrounds
+        'lavender': '#DDD6FE',        // For UI elements, borders
+        'lavender-medium': '#A78BFA', // For buttons, accents
+        'lavender-dark': '#8B5CF6',   // For stronger accents, text
+        'deep-purple': '#5B21B6',    // For text, highlights
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
