@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MessageSquareHeart, Users, LogIn, Home, PlusSquare, UserPlus, LogOut, BookOpenText } from 'lucide-react'; // Added BookOpenText
+import { MessageSquareHeart, Users, LogIn, Home, PlusSquare, UserPlus, LogOut, BookOpenText } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth'; 
 import { auth } from '../utils/firebase';
 import { signOut } from 'firebase/auth';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 
 const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: React.ElementType }> = ({ to, children, icon: Icon }) => {
   const location = useLocation();
-  const isActive = location.pathname === to || (to === "/forum" && location.pathname.startsWith("/forum")); // Make Forum active for /forum/*
+  const isActive = location.pathname === to || (to === "/forum" && location.pathname.startsWith("/forum"));
   return (
     <Link
       to={to}
@@ -20,7 +20,6 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: React.El
     </Link>
   );
 };
-
 
 const Navbar: React.FC = () => {
   const { currentUser, isLoading } = useAuth();
@@ -53,9 +52,7 @@ const Navbar: React.FC = () => {
                 <>
                   <NavLink to="/forum" icon={Users}>Forum</NavLink>
                   <NavLink to="/new" icon={PlusSquare}>Create Post</NavLink>
-                  <NavLink to="/resources" icon={BookOpenText}>Resources</NavLink> {/* Added Resources Link */}
-                  {/* Placeholder for Admin Link based on role, if needed later in a dropdown or user profile page */}
-                  {/* <NavLink to="/admin" icon={UserCog}>Admin</NavLink> */}
+                  <NavLink to="/resources" icon={BookOpenText}>Resources</NavLink>
                   <Button 
                     variant="ghost" 
                     onClick={handleLogout} 
