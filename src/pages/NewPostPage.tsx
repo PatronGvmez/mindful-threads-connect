@@ -16,6 +16,7 @@ import { POST_CATEGORIES, PostCategoryValue } from '@/utils/constants';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Post } from '@/utils/types'; // Import Post type
 
 const postSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100, "Title must be 100 characters or less"),
@@ -47,7 +48,15 @@ const NewPostPage: React.FC = () => {
       return;
     }
     try {
-      await createPost({ ...data, authorUid: currentUser.uid });
+      // Explicitly construct the payload to ensure type correctness
+      const postPayload: Omit<Post, 'id' | 'timestamp' | 'replyCount' | 'flagged'> = {
+        authorUid: currentUser.uid,
+        title: data.title,
+        content: data.content,
+        category: data.category,
+        isAnonymous: data.isAnonymous,
+      };
+      await createPost(postPayload);
       toast.success("Post created successfully!");
       navigate('/forum'); // Or navigate to the new post's page: `/post/${newPostId}`
     } catch (error) {

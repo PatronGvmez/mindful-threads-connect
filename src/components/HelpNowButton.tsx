@@ -25,8 +25,9 @@ const HelpNowButton: React.FC = () => {
               <ShieldAlert size={28} className="mr-2" /> Urgent Help Needed?
             </DialogTitle>
             <DialogDescription className="mt-2 text-gray-600">
-              If you are in crisis or need immediate support, please use the resources below.
-              Your safety is important.
+              If you are in crisis, feeling overwhelmed, or in danger, please use these resources immediately.
+              These services are available to provide support. Your safety is the priority.
+              Remember, reaching out is a sign of strength.
             </DialogDescription>
           </DialogHeader>
           
@@ -36,10 +37,10 @@ const HelpNowButton: React.FC = () => {
               <li><strong>National Suicide Prevention Lifeline (USA):</strong> Call or Text <a href="tel:988" className="text-red-500 hover:underline font-bold">988</a></li>
               <li><strong>Crisis Text Line (USA):</strong> Text HOME to <a href="sms:741741" className="text-red-500 hover:underline font-bold">741741</a></li>
               <li><strong>The Trevor Project (LGBTQ Youth):</strong> Call <a href="tel:1-866-488-7386" className="text-red-500 hover:underline font-bold">1-866-488-7386</a></li>
-              <li><em>(Replace with or add local/regional hotlines)</em></li>
+              <li><em>(You can find local/regional hotlines by searching online for "crisis hotlines [your area]")</em></li>
             </ul>
              <p className="mt-3 text-sm text-gray-500">
-              For immediate medical emergencies, call your local emergency number (e.g., 911 or 112).
+              For immediate medical emergencies or if you are in physical danger, please call your local emergency number (e.g., 911 in the USA, 112 in Europe, etc.) without delay.
             </p>
           </div>
 

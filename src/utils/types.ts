@@ -1,6 +1,6 @@
 
 import { Timestamp } from 'firebase/firestore';
-import { PostCategoryValue } from './constants';
+import { PostCategoryValue as ImportedPostCategoryValue } from './constants'; // Import with an alias
 
 export interface UserProfile {
   uid: string;
@@ -13,7 +13,7 @@ export interface UserProfile {
 export interface Post {
   id: string;
   authorUid: string;
-  category: PostCategoryValue;
+  category: ImportedPostCategoryValue; // Use the imported alias
   title: string;
   content: string;
   timestamp: Timestamp;
@@ -30,5 +30,7 @@ export interface Comment {
   timestamp: Timestamp;
 }
 
-// Add other types as the application grows
+// Re-export PostCategoryValue so it's available to other modules importing from types.ts
+export type PostCategoryValue = ImportedPostCategoryValue;
 
+// Add other types as the application grows

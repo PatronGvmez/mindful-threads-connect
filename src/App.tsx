@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import ResourcesPage from "./pages/ResourcesPage"; // Import ResourcesPage
 import HelpNowButton from "./components/HelpNowButton"; // Import HelpNowButton
 import ChatWidget from "./components/ChatWidget"; // Import ChatWidget
 import { useAuth } from "./hooks/useAuth";
+import React from 'react';
 
 
 // Placeholder pages - we will create these later
@@ -54,7 +54,7 @@ const AppLayout = () => {
 };
 
 // ProtectedRoute component
-const ProtectedRoute: React.FC<{ children: JSX.Element, roles?: string[] }> = ({ children, roles }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode, roles?: string[] }> = ({ children, roles }) => {
   const { currentUser, isLoading } = useAuth();
   // If you implement role fetching into useAuth, you can use it here
   // For now, just checks if user is logged in for general protected routes.
@@ -77,7 +77,7 @@ const ProtectedRoute: React.FC<{ children: JSX.Element, roles?: string[] }> = ({
   //   return <Navigate to="/" replace />; // Or a specific "unauthorized" page
   // }
 
-  return children;
+  return <>{children}</>; {/* Changed to React.Fragment to ensure it's valid with React.ReactNode */}
 };
 
 

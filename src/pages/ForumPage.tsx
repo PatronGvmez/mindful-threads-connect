@@ -7,6 +7,7 @@ import PostCard from '@/components/PostCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { POST_CATEGORIES, PostCategoryValue } from '@/utils/constants';
 import { Skeleton } from '@/components/ui/skeleton'; // For loading state
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'; // Added Card imports
 
 const ForumPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
