@@ -5,18 +5,24 @@ import { UserProfile } from './types';
 
 /**
  * Fetches a user profile from Firestore. If it doesn't exist,
- * it creates a new one with a default role of "user".
+ * it creates a new one.
  * @param uid The user's unique ID from Firebase Auth.
+ * @param initialData Optional data to use when creating a new profile.
  * @returns A Promise resolving to the UserProfile object.
  */
-export async function getOrCreateUserProfile(uid: string): Promise<UserProfile> {
+export async function getOrCreateUserProfile(
+  uid: string,
+  initialData?: Partial<Pick<UserProfile, 'email' | 'displayName' | 'role'>>
+): Promise<UserProfile> {
   const userDocRef = doc(db, "users", uid);
   let userDocSnap = await getDoc(userDocRef);
 
   if (!userDocSnap.exists()) {
-    const newUserProfileData = {
+    const newUserProfileData: Omit<UserProfile, 'joinedAt' | 'uid'> & { joinedAt: any, uid: string } = {
       uid,
-      role: "user" as UserProfile["role"],
+      email: initialData?.email,
+      displayName: initialData?.displayName,
+      role: initialData?.role || "user", // Default to "user" if not provided
       joinedAt: serverTimestamp(),
     };
     await setDoc(userDocRef, newUserProfileData);
@@ -24,7 +30,6 @@ export async function getOrCreateUserProfile(uid: string): Promise<UserProfile> 
     userDocSnap = await getDoc(userDocRef);
     
     if (!userDocSnap.exists()) {
-      // This case should ideally not be reached if setDoc was successful
       throw new Error("Failed to create or fetch user document after attempting creation.");
     }
   }
@@ -34,13 +39,15 @@ export async function getOrCreateUserProfile(uid: string): Promise<UserProfile> 
     throw new Error("User document data is undefined after fetch/create.");
   }
 
-  // Ensure the role is one of the expected values, defaulting to "user" if invalid.
+  // Ensure the role is one of the expected values, defaulting to "user" if invalid or missing.
   const role = (data.role === "admin" || data.role === "user") ? data.role : "user";
 
   return {
-    uid: data.uid || uid, // Use UID from data or fallback to input UID
+    uid: data.uid || uid,
+    email: data.email,
+    displayName: data.displayName,
     role,
-    joinedAt: data.joinedAt as Timestamp, // Firestore Timestamps are fetched directly
+    joinedAt: data.joinedAt as Timestamp,
   };
 }
 

@@ -8,7 +8,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import LoginPage from "./pages/LoginPage"; // Updated import
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage"; // Import RegisterPage
 
 // Placeholder pages - we will create these later
 const ForumPage = () => <div className="container mx-auto p-4 text-center">Forum Page - Coming Soon!</div>;
@@ -33,7 +34,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner /> {/* Ensure Sonner is here for toast notifications from LoginPage */}
+      <Sonner />
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
@@ -42,7 +43,8 @@ const App = () => (
             <Route path="/new" element={<NewPostPage />} />
             <Route path="/post/:id" element={<PostDetailPage />} />
             <Route path="/admin" element={<AdminPage />} />
-            <Route path="/login" element={<LoginPage />} /> {/* Using the actual LoginPage */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} /> {/* Add RegisterPage route */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>

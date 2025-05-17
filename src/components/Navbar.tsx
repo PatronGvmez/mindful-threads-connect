@@ -1,35 +1,75 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { MessageSquareHeart, Users, ShieldCheck, LogIn, Home, PlusSquare } from 'lucide-react'; // Using MessageSquareHeart as a placeholder for app icon
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MessageSquareHeart, Users, LogIn, Home, PlusSquare, UserPlus, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth'; // Ensure this path is correct
+import { auth } from '../utils/firebase';
+import { signOut } from 'firebase/auth';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button'; // Using shadcn button
+
+const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: React.ElementType }> = ({ to, children, icon: Icon }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  return (
+    <Link
+      to={to}
+      className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors
+        ${isActive ? 'bg-lavender text-deep-purple' : 'text-gray-700 hover:text-lavender-dark hover:bg-lavender-light'}`}
+    >
+      {Icon && <Icon size={18} className="mr-1" />} {children}
+    </Link>
+  );
+};
 
 const Navbar: React.FC = () => {
+  const { currentUser, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success('Logged out successfully.');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Failed to log out.');
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-6 py-3 flex justify-between items-center">
         <Link to="/" className="flex items-center text-lavender-dark hover:text-deep-purple">
           <MessageSquareHeart size={32} className="mr-2" />
           <span className="font-bold text-xl">MindLink</span>
-          <span className="ml-2 text-2xl">🐰</span> {/* Bunny Mascot */}
+          <span className="ml-2 text-2xl">🐰</span>
         </Link>
-        <div className="space-x-4">
-          <Link to="/" className="text-gray-700 hover:text-lavender-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
-            <Home size={18} className="mr-1" /> Home
-          </Link>
-          <Link to="/forum" className="text-gray-700 hover:text-lavender-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
-            <Users size={18} className="mr-1" /> Forum
-          </Link>
-          <Link to="/new" className="text-gray-700 hover:text-lavender-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
-            <PlusSquare size={18} className="mr-1" /> Create Post
-          </Link>
-          <Link to="/admin" className="text-gray-700 hover:text-lavender-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
-            <ShieldCheck size={18} className="mr-1" /> Admin
-          </Link>
-          {/* We'll add auth state later to show Login/User button */}
-          {/* For now, a placeholder login link */}
-          <Link to="/login" className="text-gray-700 hover:text-lavender-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
-             <LogIn size={18} className="mr-1" /> Login
-          </Link>
+        <div className="space-x-1 md:space-x-2 flex items-center">
+          {!isLoading && (
+            <>
+              <NavLink to="/" icon={Home}>Home</NavLink>
+              {currentUser ? (
+                <>
+                  <NavLink to="/forum" icon={Users}>Forum</NavLink>
+                  <NavLink to="/new" icon={PlusSquare}>Create Post</NavLink>
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleLogout} 
+                    className="text-gray-700 hover:text-lavender-dark px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                  >
+                    <LogOut size={18} className="mr-1" /> Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <NavLink to="/register" icon={UserPlus}>Register</NavLink>
+                  <NavLink to="/login" icon={LogIn}>Login</NavLink>
+                </>
+              )}
+            </>
+          )}
+          {isLoading && <p className="text-sm text-gray-500">Loading...</p>}
         </div>
       </div>
     </nav>
@@ -37,3 +77,4 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+

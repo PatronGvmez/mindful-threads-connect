@@ -1,84 +1,121 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../utils/firebase';
-import { signInAnonymously, onAuthStateChanged, User } from 'firebase/auth';
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { getOrCreateUserProfile } from '../utils/authUtils';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { LogIn } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuthState, setIsCheckingAuthState] = useState(true);
   const navigate = useNavigate();
 
   const handleLoginSuccess = async (uid: string) => {
-    setIsLoading(true);
     try {
-      const userProfile = await getOrCreateUserProfile(uid);
+      // For email/password login, profile should ideally exist.
+      // getOrCreateUserProfile will fetch it, or create a default 'user' one if somehow missing.
+      const userProfile = await getOrCreateUserProfile(uid); 
       const redirectPath = userProfile.role === 'admin' ? '/admin' : '/forum';
-      toast.success(`Logged in as ${userProfile.role}. Redirecting...`);
+      toast.success(`Logged in as ${userProfile.displayName || userProfile.email || userProfile.role}. Redirecting...`);
       navigate(redirectPath, { replace: true });
     } catch (error) {
       console.error("Error processing user login:", error);
       toast.error('Login failed. Could not retrieve user profile.');
-      setIsLoading(false); // Ensure loading is false on error
+    } finally {
+      setIsLoading(false); // Ensure loading is false after processing
     }
-    // setIsLoading(false) will be effectively handled by navigation or error path
   };
 
   useEffect(() => {
-    setIsLoading(true); // Start with loading true to check auth state
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        // User is already signed in, process login
+        setIsLoading(true); // Set loading true while processing existing session
         await handleLoginSuccess(currentUser.uid);
       } else {
-        // No user signed in, ready for login action
+        setIsCheckingAuthState(false); // No user, ready for login action
         setIsLoading(false);
       }
     });
     return () => unsubscribe();
-  }, []); // Intentionally empty to run once on mount, navigate is stable
+  }, []); // navigate is stable, handleLoginSuccess changes are fine
 
-  const handleAnonymousLogin = async () => {
+  const handleEmailPasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
-      const userCredential = await signInAnonymously(auth);
-      await handleLoginSuccess(userCredential.user.uid);
-    } catch (error) {
-      console.error("Firebase Anonymous Sign-In Error:", error);
-      toast.error('Anonymous sign-in failed. Please try again.');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // onAuthStateChanged will trigger handleLoginSuccess
+    } catch (error: any) {
+      console.error("Firebase Email/Password Sign-In Error:", error);
+      let errorMessage = 'Login failed. Please check your credentials.';
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password.';
+      }
+      toast.error(errorMessage);
       setIsLoading(false);
     }
   };
 
-  if (isLoading) {
+  if (isCheckingAuthState) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center p-4">
-        <p className="text-lg text-gray-700">Loading, please wait...</p>
-        {/* You could add a spinner here */}
+        <p className="text-lg text-gray-700">Checking authentication status...</p>
       </div>
     );
   }
 
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] bg-lavender-light p-6">
       <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
-        <h1 className="text-3xl font-bold text-deep-purple mb-4">Welcome to MindLink</h1>
-        <p className="text-gray-600 mb-8">
-          Sign in anonymously to share and connect in a safe space.
+        <h1 className="text-3xl font-bold text-deep-purple mb-6">Login to MindLink</h1>
+        <form onSubmit={handleEmailPasswordLogin} className="space-y-6">
+          <div>
+            <Label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left mb-1">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <Label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left mb-1">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full"
+              placeholder="••••••••"
+            />
+          </div>
+          <Button 
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-lavender hover:bg-deep-purple text-white"
+            size="lg"
+          >
+            <LogIn size={20} className="mr-2" />
+            {isLoading ? 'Logging in...' : 'Login'}
+          </Button>
+        </form>
+        <p className="mt-6 text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/register" className="font-medium text-lavender-dark hover:text-deep-purple">
+            Register here
+          </Link>
         </p>
-        <Button 
-          onClick={handleAnonymousLogin} 
-          disabled={isLoading}
-          className="w-full bg-lavender hover:bg-deep-purple text-white"
-          size="lg"
-        >
-          <LogIn size={20} className="mr-2" />
-          Login Anonymously
-        </Button>
       </div>
     </div>
   );
