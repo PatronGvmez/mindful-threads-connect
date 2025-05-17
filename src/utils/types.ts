@@ -3,6 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 
 export interface UserProfile {
   uid: string;
+  role: "user" | "admin"; // Added role field
   joinedAt: Timestamp;
   // Add other user-specific fields if needed, e.g., displayName (though anonymous)
 }
@@ -27,3 +28,4 @@ export interface Comment {
 }
 
 // Add other types as the application grows
+
